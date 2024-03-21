@@ -100,6 +100,7 @@ const modalStyle = StyleSheet.create({
   modalTitleText: {
     marginTop: 40,
     fontSize: 30,
+    color: 'black',
     fontWeight: 'bold',
     marginHorizontal: 20,
     textAlign: 'center',

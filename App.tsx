@@ -1,28 +1,33 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Dimensions
+  Button
 } from 'react-native';
 import DeviceModal from './DeviceConnectionModal';
 import PulseIndicator from './PulseIndicator';
 import useBLE from './useBLE';
 
-import {
-  LineChart,
-  BarChart,
-  PieChart,
-  ProgressChart,
-  ContributionGraph,
-  StackedBarChart
-} from "react-native-chart-kit";
-import { Colors } from 'react-native/Libraries/NewAppScreen';
+import Svg, { Path, G } from 'react-native-svg';
+import * as d3 from 'd3-shape';
 
-const Cat = () => {
-  return <Text>Hello, I am your cat!</Text>;
+const LiveChart = ({ data, width, height }) => {
+  const line = d3.line().x((d, i) => i * (width / data.length)).y(d => height - d);
+
+  const path = line(data);
+
+  return (
+    <View style={styles.container}>
+      <Svg width={width} height={height}>
+        <G>
+          <Path d={path} fill="none" stroke="green" strokeWidth={2} />
+        </G>
+      </Svg>
+    </View>
+  );
 };
 
 const App = () => {
@@ -54,6 +59,27 @@ const App = () => {
     setIsModalVisible(true);
   };
 
+  const [heartRateData, setHeartRateData] = useState([0]);
+  const [isIncreasing, setIsIncreasing] = useState(true);
+
+  const addValue = () => {
+    setHeartRateData(prevData => [...prevData, prevData[prevData.length - 1] + 100]);
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHeartRateData(prevData => {
+        // const newValue = isIncreasing ? 50 : 0;
+        const newValue = 0;
+        const newData = [...prevData, newValue];
+        return newData.slice(-75)
+      });
+      setIsIncreasing(prev => !prev);
+    }, 0); // Change value every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [isIncreasing]);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.heartRateTitleWrapper}>
@@ -69,49 +95,14 @@ const App = () => {
           </Text>
         )}
 
-    <Text style={{color: 'black'}}>Bezier Line Chart </Text>
-      <LineChart
-        data={{
-          labels: ["1", "2", "3", "4", "5", "6"],
-          datasets: [
-            {
-              data: [
-                Math.random() * 100,
-                Math.random() * 100,
-                Math.random() * 100,
-                Math.random() * 100,
-                Math.random() * 100,
-                Math.random() * 100
-              ]
-            }
-          ]
-        }}
-        width={Dimensions.get("window").width} // from react-native
-        height={220}
-        yAxisInterval={1} // optional, defaults to 1
-        chartConfig={{
-          backgroundColor: "#ffffff",
-          backgroundGradientFrom: "#ffffff",
-          backgroundGradientTo: "#ffffff",
-          decimalPlaces: 2, // optional, defaults to 2dp
-          color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          style: {
-            borderRadius: 16
-          },
-          propsForDots: {
-            r: "6",
-            strokeWidth: "2",
-            stroke: "#ffa726"
-          }
-        }}
-        bezier
-        style={{
-          marginVertical: 8,
-          borderRadius: 16
-        }}
-      />
+        {/* // Display Live */}
+        <LiveChart data={heartRateData} width={300} height={500} />
+      </View>   
+
+      <View>
+        <Button title="Add Value" onPress={addValue} />
       </View>
+
       <TouchableOpacity
         onPress={connectedDevice ? disconnectFromDevice : openModal}
         style={styles.ctaButton}>
@@ -119,6 +110,7 @@ const App = () => {
           {connectedDevice ? 'Disconnect' : 'Connect'}
         </Text>
       </TouchableOpacity>
+
       <DeviceModal
         closeModal={hideModal}
         visible={isModalVisible}
@@ -128,6 +120,7 @@ const App = () => {
     </SafeAreaView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -163,6 +156,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: 'white',
+  },
+  chartContainer: {
+    marginBottom: 20,
   },
 });
 

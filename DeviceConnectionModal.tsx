@@ -71,6 +71,14 @@ const DeviceModal: FC<DeviceModalProps> = props => {
           data={devices}
           renderItem={renderDeviceModalListItem}
         />
+
+        <TouchableOpacity
+          onPress={closeModal}
+          style={modalStyle.ctaButton}>
+          <Text style={modalStyle.ctaButtonText}>
+            {"Home Screen"}
+          </Text>
+        </TouchableOpacity>
       </SafeAreaView>
     </Modal>
   );
@@ -113,6 +121,7 @@ const modalStyle = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 5,
     borderRadius: 8,
+    padding: 10,
   },
   ctaButtonText: {
     fontSize: 18,

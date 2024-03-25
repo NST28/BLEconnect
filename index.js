@@ -1,17 +1,14 @@
-/**
- * @format
- */
-
 import {AppRegistry} from 'react-native';
-import Home from './screen/HomeScreen';
-import DataScreen from './screen/DataScreen';
 import {name as appName} from './app.json';
 
 import * as React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-
 import {LogBox} from 'react-native';
+
+import Home from './screen/HomeScreen';
+import DataScreen from './screen/DataScreen';
+
 LogBox.ignoreLogs(['new NativeEventEmitter']);
 
 const Stack = createNativeStackNavigator();

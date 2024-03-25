@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import {useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {PermissionsAndroid, Platform} from 'react-native';
 import {
   BleError,
@@ -9,11 +9,11 @@ import {
 } from 'react-native-ble-plx';
 import {PERMISSIONS, requestMultiple} from 'react-native-permissions';
 import DeviceInfo from 'react-native-device-info';
-
 import {atob} from 'react-native-quick-base64';
 
-const HEART_RATE_UUID = '0000180d-0000-1000-8000-00805f9b34fb';
-const HEART_RATE_CHARACTERISTIC = '00002a37-0000-1000-8000-00805f9b34fb';
+// Modify ID base on device datasheet
+const BLE_UUID = 'FFE0';
+const BLE_CHARACTERISTIC = 'FFE1';
 
 const bleManager = new BleManager();
 
@@ -80,7 +80,7 @@ function useBLE(): BluetoothLowEnergyApi {
       if (error) {
         console.log(error);
       }
-      if (device && device.name?.includes('CorSense')) {
+      if (device && device.name?.includes('SLAVE')) {
         setAllDevices((prevState: Device[]) => {
           if (!isDuplicteDevice(prevState, device)) {
             return [...prevState, device];
@@ -114,6 +114,7 @@ function useBLE(): BluetoothLowEnergyApi {
     error: BleError | null,
     characteristic: Characteristic | null,
   ) => {
+    
     if (error) {
       console.log(error);
       return -1;
@@ -123,26 +124,18 @@ function useBLE(): BluetoothLowEnergyApi {
     }
 
     const rawData = atob(characteristic.value);
-    let innerHeartRate: number = -1;
 
-    const firstBitValue: number = Number(rawData) & 0x01;
+    console.log('New data received', rawData );
 
-    if (firstBitValue === 0) {
-      innerHeartRate = rawData[1].charCodeAt(0);
-    } else {
-      innerHeartRate =
-        Number(rawData[1].charCodeAt(0) << 8) +
-        Number(rawData[2].charCodeAt(2));
-    }
-
-    setHeartRate(innerHeartRate);
+    var received_data = Number(rawData)
+    setHeartRate(received_data);
   };
 
   const startStreamingData = async (device: Device) => {
     if (device) {
       device.monitorCharacteristicForService(
-        HEART_RATE_UUID,
-        HEART_RATE_CHARACTERISTIC,
+        BLE_UUID,
+        BLE_CHARACTERISTIC,
         (error, characteristic) => onHeartRateUpdate(error, characteristic),
       );
     } else {

@@ -1,36 +1,9 @@
-import React, {useState, useEffect } from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  Button
-} from 'react-native';
-import DeviceModal from '../DeviceConnectionModal';
-import PulseIndicator from '../PulseIndicator';
-import useBLE from '../useBLE';
-
-import Svg, { Path, G } from 'react-native-svg';
-import * as d3 from 'd3-shape';
-
+import React, { useState, useEffect, useContext } from 'react';
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-const LiveChart = ({ data, width, height }) => {
-  const line = d3.line().x((d, i) => i * (width / data.length)).y(d => height - d);
-
-  const path = line(data);
-
-  return (
-    <View style={styles.container}>
-      <Svg width={width} height={height}>
-        <G>
-          <Path d={path} fill="none" stroke="green" strokeWidth={2} />
-        </G>
-      </Svg>
-    </View>
-  );
-};
+import DeviceModal from '../DeviceConnectionModal';
+import useBLE from '../useBLE';
 
 const Home = () => {
   const {
@@ -61,37 +34,18 @@ const Home = () => {
     setIsModalVisible(true);
   };
 
-  const [heartRateData, setHeartRateData] = useState([0]);
-  const [isIncreasing, setIsIncreasing] = useState(true);
-
-  const addValue = () => {
-    setHeartRateData(prevData => [...prevData, prevData[prevData.length - 1] + 100]);
-  };
-
   const navigation = useNavigation()
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setHeartRateData(prevData => {
-        // const newValue = isIncreasing ? 50 : 0;
-        const newValue = 0;
-        const newData = [...prevData, newValue];
-        return newData.slice(-75)
-      });
-      setIsIncreasing(prev => !prev);
-    }, 0); // Change value every 5 seconds
-
-    return () => clearInterval(interval);
-  }, [isIncreasing]);
+  // console.log('Data in main screen', liveData[-1]);
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.heartRateTitleWrapper}>
         {connectedDevice ? (
           <>
-            <PulseIndicator />
-            <Text style={styles.heartRateTitleText}>Your Heart Rate Is:</Text>
-            <Text style={styles.heartRateText}>{heartRate} bpm</Text>
+            {/* <DataIndicator /> */}
+            <Text style={styles.heartRateTitleText}>Current Data:</Text>
+            <Text style={styles.heartRateText}>{heartRate}</Text>
           </>
         ) : (
           <Text style={styles.heartRateTitleText}>
@@ -99,20 +53,24 @@ const Home = () => {
           </Text>
         )}
       </View> 
-
+      
+      {/* Go to the data screen */}
       <TouchableOpacity
-        onPress={() => navigation.navigate("DataScreen")}
+        onPress={() => 
+          navigation.navigate("DataScreen")
+        }
         style={styles.ctaButton}>
         <Text style={styles.ctaButtonText}>
-          {"To Data Screen"}
+          {"Data Screen"}
         </Text>
       </TouchableOpacity>
-
+        
+      {/* Connect or disconnect device */}
       <TouchableOpacity
         onPress={connectedDevice ? disconnectFromDevice : openModal}
         style={styles.ctaButton}>
         <Text style={styles.ctaButtonText}>
-          {connectedDevice ? 'Disconnect' : 'Connect'}
+          {connectedDevice ? 'Disconnect' : 'Connect BLE Device'}
         </Text>
       </TouchableOpacity>
 
@@ -147,6 +105,7 @@ const styles = StyleSheet.create({
   heartRateText: {
     fontSize: 25,
     marginTop: 15,
+    color: 'black',
   },
   ctaButton: {
     backgroundColor: 'purple',
@@ -156,6 +115,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 5,
     borderRadius: 8,
+    padding: 10,
   },
   ctaButtonText: {
     fontSize: 18,

@@ -2,8 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import DeviceModal from '../DeviceConnectionModal';
-import useBLE from '../useBLE';
+import DeviceModal from './DeviceConnectionModal';
+import useBLE from './useBLE';
 
 const Home = () => {
   const {

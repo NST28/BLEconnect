@@ -6,8 +6,8 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {LogBox} from 'react-native';
 
-import Home from './screen/HomeScreen';
-import DataScreen from './screen/DataScreen';
+import Home from './src/HomeScreen';
+import DataScreen from './src/DataScreen';
 
 LogBox.ignoreLogs(['new NativeEventEmitter']);
 

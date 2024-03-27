@@ -8,6 +8,7 @@ import {LogBox} from 'react-native';
 
 import Home from './src/HomeScreen';
 import DataScreen from './src/DataScreen';
+import { DataContextProvider } from './src/Context';
 
 LogBox.ignoreLogs(['new NativeEventEmitter']);
 
@@ -16,10 +17,12 @@ const Stack = createNativeStackNavigator();
 const App = () => {
     return (
       <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="Home" component={Home}/>
-          <Stack.Screen name="DataScreen" component={DataScreen} />
-        </Stack.Navigator>
+        <DataContextProvider>
+          <Stack.Navigator>
+            <Stack.Screen name="Home" component={Home}/>
+            <Stack.Screen name="DataScreen" component={DataScreen} />
+          </Stack.Navigator>
+        </DataContextProvider>
       </NavigationContainer>
     );
   };

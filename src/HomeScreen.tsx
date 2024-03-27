@@ -1,9 +1,23 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, Button } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, Button, AppRegistry } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import DeviceModal from './DeviceConnectionModal';
 import useBLE from './useBLE';
+import { DataContext } from './Context';
+
+let dataArray = [0];
+
+
+function appendData(array, newData) {
+  const lastValue = array[array.length - 1];
+
+  if (newData !== lastValue) {
+    array.push(newData);
+  }
+  
+  return array;
+}
 
 const Home = () => {
   const {
@@ -36,7 +50,17 @@ const Home = () => {
 
   const navigation = useNavigation()
 
-  // console.log('Data in main screen', liveData[-1]);
+  const {setLiveData} = useContext(DataContext);
+  var Array = appendData(dataArray, heartRate);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveData(Array);
+    }, 1000);
+
+    // Clean up interval
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>

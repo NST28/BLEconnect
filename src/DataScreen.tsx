@@ -1,9 +1,11 @@
 import React, {useState, useEffect, useContext} from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, Dimensions } from 'react-native';
 
 import Svg, { Path, G } from 'react-native-svg';
 import * as d3 from 'd3-shape';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation} from '@react-navigation/native';
+import { DataContext } from './Context';
+
 
 const LiveChart = ({ data, width, height }) => {
   const line = d3.line().x((d, i) => i * (width / data.length)).y(d => height - d);
@@ -29,13 +31,20 @@ const DataScreen = () => {
   };
 
   const navigation = useNavigation()
+
+  // Get sensor datas
+  const liveData = useContext(DataContext);
+  var liveDataObj = liveData.liveData;
+
+  var newData = 0;
   
   useEffect(() => {
     const interval = setInterval(() => {
-      setHeartRateData(prevData => {
-        const newValue = 0;
-        const newData = [...prevData, newValue];
-        return newData.slice(-75)
+      setHeartRateData(prevData => {        
+        newData = liveDataObj[Object.keys(liveDataObj)[Object.keys(liveDataObj).length - 1]] * 0.4;
+        // newData = Math.random() * 100;
+        const chartData = [...prevData, newData];
+        return chartData.slice(-100)
       });
     }, 0); // Set time interval
 
@@ -45,9 +54,10 @@ const DataScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.chart}>
+
         {/* // Display Live chart */}
         <Text style={styles.chartName}>
-          {"Signal received chart"}
+          {"Signal chart"}
         </Text>
 
         <LiveChart data={heartRateData} width={300} height={300} />
